@@ -35,10 +35,13 @@ public class TodoService {
     }
 
     public TodoDto updateTodo(Long id, TodoDto todoDto) {
+//        check whether user exist or not
         boolean userExist = todoRepository.existsById(id);
         if(!userExist) throw new RuntimeException("Todo doesn't exist by id:"+id);
 
+//        same steps as creation + setting id in entity
         TodoEntity todoEntity = modelMapper.map(todoDto, TodoEntity.class);
+//        setting id in entity so that updates will be done in that record only
         todoEntity.setId(id);
         TodoEntity todoEntity1 = todoRepository.save(todoEntity);
         return modelMapper.map(todoEntity1, TodoDto.class);

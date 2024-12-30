@@ -18,36 +18,42 @@ public class TodoController {
 
     private final TodoService todoService;
 
+//    Create
     @PostMapping
     public ResponseEntity<TodoDto> createTask(@RequestBody TodoDto todoDto){
         TodoDto todoDto1 = todoService.createNewTask(todoDto);
         return new ResponseEntity<>(todoDto1, HttpStatus.CREATED);
     }
 
+//    find all todos
     @GetMapping
     public ResponseEntity<List<TodoDto>> getAllTodos(){
         List<TodoDto> todoDtos = todoService.getAllTodos();
         return ResponseEntity.ok(todoDtos);
      }
 
+//     find by id
      @GetMapping(path = "/{id}")
     public ResponseEntity<TodoDto> getTodoById(@PathVariable Long id){
          Optional<TodoDto> todoDto = todoService.getTodoById(id);
          return todoDto.map(todoDto1 -> ResponseEntity.ok(todoDto1)).orElseThrow(()-> new RuntimeException("Todo not found with id :"+id));
      }
 
+//     update by id
      @PutMapping(path = "/update/{id}")
      public ResponseEntity<TodoDto> updateDto(@PathVariable Long id, @RequestBody TodoDto todoDto){
         TodoDto todoDto1 = todoService.updateTodo(id,todoDto);
         return ResponseEntity.ok(todoDto1);
      }
 
+//     delete by id
      @DeleteMapping("/{id}")
     public String deleteTodo(@PathVariable Long id){
         todoService.deleteTodoById(id);
         return "Todo deleted Successfully";
      }
 
+//     update by id -> Only a particular field
      @PatchMapping("/{id}")
         public ResponseEntity<TodoDto> updatestatusCompleted(@PathVariable Long id){
         TodoDto todoDto1 = todoService.updatestatusCompleted(id);
