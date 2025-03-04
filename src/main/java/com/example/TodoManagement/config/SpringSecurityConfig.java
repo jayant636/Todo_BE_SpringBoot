@@ -1,9 +1,12 @@
 package com.example.TodoManagement.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,11 +17,19 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@RequiredArgsConstructor
 public class SpringSecurityConfig {
+
+    private final UserDetailsService userDetailsService;
 
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -36,20 +47,24 @@ public class SpringSecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails user  = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("1234"))
-                .roles("User")
-                .build();
 
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("5678"))
-                .roles("Admin")
-                .build();
 
-        return new InMemoryUserDetailsManager(user,admin);
-    }
+//    InMemory authentication
+
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        UserDetails user  = User.builder()
+//                .username("user")
+//                .password(passwordEncoder().encode("1234"))
+//                .roles("User")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("5678"))
+//                .roles("Admin")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user,admin);
+//    }
 }
