@@ -27,6 +27,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+//    Register API
     public String register(RegisterDto registerDto){
         Boolean user = userRepository.existsByEmail(registerDto.getEmail());
         if(user) throw new RuntimeException("User already exists with this email"+user);
@@ -46,6 +47,7 @@ public class AuthService {
         return "User Registered Successfully";
     }
 
+//    Login API
     public String login(LoginDto loginDto) {
         Boolean user = userRepository.existsByEmail(loginDto.getEmail());
         if(!user) throw new RuntimeException("User doesn't exists with this email Id"+loginDto.getEmail());
