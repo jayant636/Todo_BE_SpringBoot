@@ -26,13 +26,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
 //    Register API
     public String register(RegisterDto registerDto){
         Boolean user = userRepository.existsByEmail(registerDto.getEmail());
         if(user) throw new RuntimeException("User already exists with this email"+user);
         User user1 = new User();
-        user1.setUsername(registerDto.getUsername());
+        user1.setUsername(registerDto.getUserName());
         user1.setEmail(registerDto.getEmail());
         user1.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
@@ -58,6 +59,7 @@ public class AuthService {
         ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "User Logged In Successfully";
+
+        return jwtService.generateToken(authentication);
     }
 }

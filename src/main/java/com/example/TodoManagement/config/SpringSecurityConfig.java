@@ -15,11 +15,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -36,14 +39,21 @@ public class SpringSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((auth)->{
-                    auth.requestMatchers(HttpMethod.POST,"/api/**").permitAll();
-                    auth.requestMatchers(HttpMethod.PUT,"/api/**").hasRole("Admin");
-                    auth.requestMatchers(HttpMethod.DELETE,"/api/**").hasRole("Admin");
+                      auth.requestMatchers("/api/auth/**").permitAll();
+                      auth.requestMatchers(HttpMethod.OPTIONS,"/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/api/**").hasRole("Admin");
+                    auth.requestMatchers(HttpMethod.PUT,"/api/**").permitAll();
+                    auth.requestMatchers(HttpMethod.DELETE,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.PATCH,"/api/**").permitAll();
 
-                    auth.anyRequest().authenticated();
-                }).httpBasic(Customizer.withDefaults());
+//                    auth.anyRequest().authenticated();
+                });
+//                .httpBasic(Customizer.withDefaults());
+        httpSecurity.exceptionHandling(exception-> exception
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        );
+        httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
