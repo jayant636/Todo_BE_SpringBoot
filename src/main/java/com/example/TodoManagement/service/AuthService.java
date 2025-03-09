@@ -1,5 +1,6 @@
 package com.example.TodoManagement.service;
 
+import com.example.TodoManagement.dtos.JwtAuthResponse;
 import com.example.TodoManagement.dtos.LoginDto;
 import com.example.TodoManagement.dtos.RegisterDto;
 import com.example.TodoManagement.entity.Role;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -49,7 +51,7 @@ public class AuthService {
     }
 
 //    Login API
-    public String login(LoginDto loginDto) {
+    public JwtAuthResponse login(LoginDto loginDto) {
         Boolean user = userRepository.existsByEmail(loginDto.getEmail());
         if(!user) throw new RuntimeException("User doesn't exists with this email Id"+loginDto.getEmail());
 
@@ -60,6 +62,25 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return jwtService.generateToken(authentication);
+        String token =  jwtService.generateToken(authentication);
+
+
+        Optional<User> user1 = userRepository.findByEmail( loginDto.getEmail());
+
+        String role =null;
+        if(user1.isPresent()){
+            User loggedInUser = user1.get();
+            Optional<Role> optionalRole =  loggedInUser.getRoles().stream().findFirst();
+
+            if(optionalRole.isPresent()){
+                Role userRole = optionalRole.get();
+                role = userRole.getName();
+            }
+        }
+
+        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+        jwtAuthResponse.setRole(role);
+        jwtAuthResponse.setAccessToken(token);
+        return jwtAuthResponse;
     }
 }

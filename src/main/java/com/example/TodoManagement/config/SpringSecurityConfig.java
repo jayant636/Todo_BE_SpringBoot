@@ -41,13 +41,12 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests((auth)->{
                       auth.requestMatchers("/api/auth/**").permitAll();
                       auth.requestMatchers(HttpMethod.OPTIONS,"/**").permitAll();
-                    auth.requestMatchers(HttpMethod.POST,"/api/**").hasRole("Admin");
+                    auth.requestMatchers(HttpMethod.POST,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.PUT,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.DELETE,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET,"/api/**").permitAll();
                     auth.requestMatchers(HttpMethod.PATCH,"/api/**").permitAll();
-
-//                    auth.anyRequest().authenticated();
+                    auth.anyRequest().authenticated();
                 });
 //                .httpBasic(Customizer.withDefaults());
         httpSecurity.exceptionHandling(exception-> exception
